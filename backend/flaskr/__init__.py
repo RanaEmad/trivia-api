@@ -94,7 +94,7 @@ def create_app(test_config=None):
   '''
     @app.route('/questions/<question_id>', methods=['DELETE'])
     def delete_question(question_id):
-        question = Question.query.filter_by(id=question_id)
+        question = Question.query.filter_by(id=question_id).one()
         question.delete()
         response = {
             "success": True,
