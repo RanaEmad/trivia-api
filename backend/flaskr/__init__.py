@@ -95,7 +95,9 @@ def create_app(test_config=None):
     @app.route('/questions/<question_id>', methods=['DELETE'])
     @cross_origin()
     def delete_question(question_id):
-        question = Question.query.filter_by(id=question_id).one()
+        question = Question.query.filter_by(id=question_id).one_or_none()
+        if question is None:
+            abort(404)
         question.delete()
         response = {
             "success": True,
@@ -167,6 +169,9 @@ def create_app(test_config=None):
     @app.route("/categories/<category_id>/questions")
     @cross_origin()
     def get_category_questions(category_id):
+        category = Category.query.filter_by(id=category_id).one_or_none()
+        if category is None:
+            abort(404)
         page = request.args.get("page", 1, type=int)
         start = (page - 1) * 10
         end = start + 10
