@@ -41,7 +41,9 @@ def create_app(test_config=None):
     @cross_origin()
     def get_categories():
         categories = Category.query.all()
-        formatted_categories = [category.format() for category in categories]
+        formatted_categories = {}
+        for category in categories:
+            formatted_categories[category.id] = category.type
         response = {
             "success": True,
             "categories": formatted_categories
@@ -92,7 +94,7 @@ def create_app(test_config=None):
   '''
     @app.route('/questions/<question_id>', methods=['DELETE'])
     def delete_question(question_id):
-        question=Question.query.filter_by(id=question_id)
+        question = Question.query.filter_by(id=question_id)
         question.delete()
         response = {
             "success": True,
@@ -111,6 +113,17 @@ def create_app(test_config=None):
   the form will clear and the question will appear at the end of the last page
   of the questions list in the "List" tab.  
   '''
+
+    @app.route('/questions', methods=['POST'])
+    def add_question():
+        question = Question(question=request.get_json()["question"], answer=request.get_json()[
+                            "answer"], difficulty=request.get_json()["difficulty"], category=request.get_json()["category"])
+        question.insert()                    
+        response = {
+            "success": True,
+            "question_id": question.id
+        }
+        return jsonify(response)
 
     '''
   @TODO: 
