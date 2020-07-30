@@ -93,6 +93,7 @@ def create_app(test_config=None):
   This removal will persist in the database and when you refresh the page.
   '''
     @app.route('/questions/<question_id>', methods=['DELETE'])
+    @cross_origin()
     def delete_question(question_id):
         question = Question.query.filter_by(id=question_id).one()
         question.delete()
@@ -115,6 +116,7 @@ def create_app(test_config=None):
   '''
 
     @app.route('/questions', methods=['POST'])
+    @cross_origin()
     def add_question():
         question = Question(question=request.get_json()["question"], answer=request.get_json()[
                             "answer"], difficulty=request.get_json()["difficulty"], category=request.get_json()["category"])
