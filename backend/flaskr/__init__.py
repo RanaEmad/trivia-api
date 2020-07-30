@@ -70,13 +70,15 @@ def create_app(test_config=None):
         formatted_questions = [question.format() for question in questions]
 
         categories = Category.query.all()
-        formatted_categories = [category.format() for category in categories]
+        formatted_categories = {}
+        for category in categories:
+            formatted_categories[category.id] = category.type
 
         response = {
             "success": True,
             "questions": formatted_questions[start:end],
             "total_questions": len(formatted_questions),
-            "categories":formatted_categories,
+            "categories": formatted_categories,
             "current_category": None
         }
         return jsonify(response)
