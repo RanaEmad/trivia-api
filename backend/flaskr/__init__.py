@@ -118,7 +118,7 @@ def create_app(test_config=None):
     def add_question():
         question = Question(question=request.get_json()["question"], answer=request.get_json()[
                             "answer"], difficulty=request.get_json()["difficulty"], category=request.get_json()["category"])
-        question.insert()                    
+        question.insert()
         response = {
             "success": True,
             "question_id": question.id
@@ -144,6 +144,22 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
+    @app.route("/categories/<category_id>/questions")
+    @cross_origin()
+    def get_category_questions(category_id):
+        page = request.args.get("page", 1, type=int)
+        start = (page - 1) * 10
+        end = start + 10
+        questions = Question.query.filter_by(category=category_id).all()
+        formatted_questions = [question.format() for question in questions]
+
+        response = {
+            "success": True,
+            "questions": formatted_questions[start:end],
+            "total_questions": len(formatted_questions),
+            "current_category": category_id
+        }
+        return jsonify(response)
 
     '''
   @TODO: 
