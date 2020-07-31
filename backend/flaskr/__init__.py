@@ -120,6 +120,12 @@ def create_app(test_config=None):
     @app.route('/questions', methods=['POST'])
     @cross_origin()
     def add_question():
+        if "question" not in request.get_json() or request.get_json()["question"] == "" or "answer" not in request.get_json() or request.get_json()["answer"] == "" or "difficulty" not in request.get_json() or request.get_json()["difficulty"] == "" or "category" not in request.get_json() or request.get_json()["category"] == "":
+            abort(400)
+        category = Category.query.filter_by(
+            id=request.get_json()["category"]).one_or_none()
+        if category is None:
+            abort(404)
         question = Question(question=request.get_json()["question"], answer=request.get_json()[
                             "answer"], difficulty=request.get_json()["difficulty"], category=request.get_json()["category"])
         question.insert()
