@@ -45,7 +45,9 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_delete_question(self):
         res = self.client().delete('/questions/5')
+        question = Question.query.filter_by(id=5).one_or_none()
         self.assertEqual(res.status_code, 200)
+        self.assertEqual(question, None)
 
     def test_delete_question_not_found(self):
         res = self.client().delete('/questions/1000')
@@ -54,7 +56,20 @@ class TriviaTestCase(unittest.TestCase):
     def test_add_question(self):
         res = self.client().post('/questions',
                                  json={"question": "test question", "answer": "test answer", "difficulty": 1, "category": 1})
+        data = json.loads(res.data)
+        question = Question.query.filter_by(
+            id=data["question_id"]).one_or_none()
         self.assertEqual(res.status_code, 200)
+        self.assertEqual("test question", question.question)
+
+    def test_add_question_invalid_data(self):
+        res = self.client().post('/questions', json={})
+        self.assertEqual(res.status_code, 400)
+
+    def test_add_question_category_not_found(self):
+        res = self.client().post('/questions',
+                                 json={"question": "test question", "answer": "test answer", "difficulty": 1, "category": 1000})
+        self.assertEqual(res.status_code, 404)
 
     def test_search_question(self):
         res = self.client().post('/questions/search',
